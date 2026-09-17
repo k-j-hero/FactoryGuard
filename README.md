@@ -22,6 +22,8 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 
 **처음 보는 경우:** [결과물을 어디서 어떻게 보는지](docs/VIEWING.md)부터 확인하세요.
 
+**테스트할 영상이 없다면:** [공개 샘플로 첫 실제 추론 실행](docs/FIRST_DEMO.md). 전용 가상환경에서 설치부터 짧은 결과 영상 생성까지 진행하는 명령을 제공합니다.
+
 ## 프로젝트 구조
 
 ```text
