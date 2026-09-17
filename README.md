@@ -15,7 +15,7 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 - [x] 이벤트 전후 annotated MP4 클립 추출 및 별도 재추출 명령
 - [x] YOLO 형식 데이터 경로 확인 및 YOLO26s 학습 명령
 - [x] VS Code 작업 공간/디버그 설정, 단위 테스트, GitHub Actions 설정
-- [ ] 실제 YOLO26s 가중치를 이용한 실행 검증
+- [x] 사전학습 YOLO26s + ByteTrack GPU 실행 검증 (person detection-only)
 - [ ] 사용자 산업현장 영상과 학습 데이터로 성능 평가
 
 현재 검증 범위는 [docs/VALIDATION.md](docs/VALIDATION.md)를 확인하세요. 실제 학습 결과나 탐지 성능 수치를 아직 보고하지 않습니다.

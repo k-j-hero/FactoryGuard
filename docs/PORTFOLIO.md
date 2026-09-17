@@ -18,12 +18,12 @@
 | --- | --- |
 | 데이터 원본/버전/라이선스 | 미확보 |
 | 촬영 단위 train/val/test 분리 | 미확인 |
-| 하드웨어, Python, PyTorch, Ultralytics | 실제 추론 환경 확정 후 기록 |
+| 하드웨어, Python, PyTorch, Ultralytics | RTX 5060 Ti 16GB, Python 3.12.14, PyTorch 2.12.1+cu130, Ultralytics 8.4.154 |
 | 학습 epoch / seed / checkpoint | 미학습 |
 | person / forklift별 precision, recall, mAP50-95 | 미측정 |
 | 별도 테스트 영상 길이/조건 | 미확보 |
 | 후보 수 / 검토상 유효 후보 / 오탐 / 놓친 근접 구간 | 미측정 |
-| 처리 시간 / 처리 FPS | 미측정 |
+| 처리 시간 / 처리 FPS | 300프레임 6.715초, 약 44.7 FPS (1280×720 detection-only 샘플 1회) |
 | 공개 가능한 데모 영상 | 미확보 |
 
 ## 평가 방식

@@ -4,13 +4,31 @@
 
 - Python 3.12.14 문법 검사: 전체 Python 파일 통과.
 - 근접 규칙 단위 테스트: 8개 통과 (2026-09-17).
-- 전체 테스트 실행: 9개 중 8개 통과, MP4 통합 테스트 1개는 의존성 미설치로 skip.
-- 실제 YOLO26s 추론, ByteTrack 연동, MP4 출력: 아직 실행 검증하지 않음.
+- 전체 테스트 실행: 로컬 Windows/GPU 환경과 GitHub Actions에서 9개 모두 통과.
+- 실제 YOLO26s 추론, ByteTrack 연동, MP4 출력: person detection-only 범위에서 실행 검증 완료.
 - MP4 통합 테스트: 작성됨. OpenCV/PyYAML/NumPy 설치가 필요함.
 - 학습: 데이터 미제공으로 미실행.
 - 현장 성능: 산업현장 MP4와 person/forklift 가중치 미제공으로 미측정.
 
-검증 환경에는 Python만 준비되어 있고 Ultralytics, PyTorch, OpenCV, PyYAML은 설치되지 않았다. 의존성을 설치한 환경에서 모델 기반 파이프라인을 추가 검증해야 한다.
+## 로컬 GPU 실제 영상 검증
+
+2026-09-17에 Pexels video 4294434의 첫 300프레임을 1280×720으로 축소해 실제 추론했다.
+
+| 항목 | 결과 |
+| --- | --- |
+| GPU | NVIDIA GeForce RTX 5060 Ti 16GB |
+| Python / PyTorch / CUDA | 3.12.14 / 2.12.1+cu130 / 13.0 |
+| Ultralytics / OpenCV | 8.4.154 / 4.14.0 |
+| 모델 / tracker | yolo26s.pt / ByteTrack |
+| 영상 | 1280×720, 25 FPS, 300프레임, 12초 |
+| 처리 | 6.715초, 약 44.7 FPS (파일 I/O와 annotation 포함) |
+| 추적 | person 1명, 300/300프레임에서 track ID 1 유지 |
+| 출력 | annotated.mp4 15.58MB, tracks.csv, summary.json |
+| 상태 | status=complete, mode=detection_only |
+
+프레임 0, 200, 299를 육안 확인해 person 박스와 ID 1이 유지되는 것을 확인했다. 이 수치는 한 샘플 구간의 실행 결과이며 일반화된 정확도나 처리 성능 벤치마크가 아니다.
+
+COCO 사전학습 모델에는 forklift 클래스가 없어서 지게차는 탐지하지 않았고 이벤트도 생성하지 않았다. 따라서 이 검증은 실제 GPU에서 YOLO26s → ByteTrack → annotated MP4/CSV 파이프라인이 동작함을 보인다. forklift 탐지, normalized proximity, potential near-miss candidate의 실제 영상 검증에는 person/forklift 데이터로 학습한 best.pt가 필요하다.
 
 ## GitHub Actions 검증
 
