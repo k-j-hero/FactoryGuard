@@ -1,0 +1,19 @@
+# Run all commands from the project root. File paths are relative to cwd.
+model: yolo26s.pt
+device: cpu  # Use '0' for the first CUDA GPU with a CUDA-enabled PyTorch install.
+imgsz: 640
+conf: 0.10  # Keep low-confidence detections for ByteTrack's second association.
+iou: 0.70
+tracker: configs/bytetrack.yaml
+require_forklift: false
+person_names: [person]
+forklift_names: [forklift]
+proximity:
+  enter_threshold: 0.08
+  exit_threshold: 0.11
+  min_duration_sec: 0.5
+  lost_tolerance_sec: 0.3
+clips:
+  enabled: true
+  pre_sec: 2.0
+  post_sec: 2.0

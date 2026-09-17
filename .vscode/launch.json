@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FactoryGuard: pretrained smoke test",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/infer.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": ["--source", "${input:video}", "--output", "${input:output}", "--max-frames", "100"]
+    },
+    {
+      "name": "FactoryGuard: trained model",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/infer.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": ["--source", "${input:video}", "--output", "${input:output}", "--model", "${input:weights}", "--require-forklift"]
+    }
+  ],
+  "inputs": [
+    {"id": "video", "type": "promptString", "description": "산업현장 MP4의 전체 경로"},
+    {"id": "output", "type": "promptString", "description": "새 결과 폴더 이름", "default": "runs/demo01"},
+    {"id": "weights", "type": "promptString", "description": "person/forklift best.pt 경로", "default": "runs/train/warehouse_yolo26s/weights/best.pt"}
+  ]
+}

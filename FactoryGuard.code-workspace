@@ -1,0 +1,10 @@
+{
+  "folders": [{"path": "."}],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+    "python.testing.unittestEnabled": true,
+    "python.testing.unittestArgs": ["-s", "tests", "-p", "test_*.py"],
+    "files.exclude": {"**/__pycache__": true}
+  },
+  "extensions": {"recommendations": ["ms-python.python", "ms-python.debugpy"]}
+}

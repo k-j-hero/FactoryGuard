@@ -1,0 +1,12 @@
+model: yolo26s.pt
+epochs: 80
+imgsz: 640
+batch: 8
+patience: 15
+device: cpu
+workers: 0
+seed: 42
+deterministic: true
+project: runs/train
+name: warehouse_yolo26s
+exist_ok: false
