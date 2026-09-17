@@ -55,7 +55,11 @@ def main():
         if getattr(args, key) is not None:
             config[key] = getattr(args, key)
     model_name = config.pop("model", "yolo26s.pt")
-    data = prepare_data(args.data, Path(config.get("project", "runs/train")) / "data.resolved.yaml")
+    # Ultralytics may prepend its default runs/detect directory to a relative
+    # project path. Resolve it here so every run lands exactly where configured.
+    project = Path(config.get("project", "runs/train")).resolve()
+    config["project"] = str(project)
+    data = prepare_data(args.data, project / "data.resolved.yaml")
     print(f"Resolved dataset: {data}")
     if args.check_only:
         return

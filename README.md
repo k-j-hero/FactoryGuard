@@ -16,9 +16,11 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 - [x] YOLO 형식 데이터 경로 확인 및 YOLO26s 학습 명령
 - [x] VS Code 작업 공간/디버그 설정, 단위 테스트, GitHub Actions 설정
 - [x] 사전학습 YOLO26s + ByteTrack GPU 실행 검증 (person detection-only)
-- [ ] 사용자 산업현장 영상과 학습 데이터로 성능 평가
+- [x] Warehouse Safety v7로 YOLO26s 학습 및 별도 test split 평가
+- [x] 외부 창고 영상에서 도메인 차이에 따른 forklift 누락 확인
+- [ ] 사용자가 확보한 산업현장 영상으로 현장별 성능 평가
 
-현재 검증 범위는 [docs/VALIDATION.md](docs/VALIDATION.md)를 확인하세요. 실제 학습 결과나 탐지 성능 수치를 아직 보고하지 않습니다.
+현재 검증 수치와 해석 범위는 [docs/VALIDATION.md](docs/VALIDATION.md)를 확인하세요. test split의 forklift 정답이 7개뿐이므로 해당 수치를 일반적인 현장 성능으로 해석하지 않습니다.
 
 **처음 보는 경우:** [결과물을 어디서 어떻게 보는지](docs/VIEWING.md)부터 확인하세요.
 
@@ -131,6 +133,8 @@ normalized_proximity = ||person_anchor - forklift_anchor|| / sqrt(width² + heig
 
 Warehouse Safety 계열의 **person/forklift 두 클래스, YOLO detection 형식**으로 내려받은 데이터를 로컬에 풀어 놓습니다. 접근 키나 다운로드 자동화는 필요하지 않습니다. 라벨은 `class_id x_center y_center width height` 형식의 정규화 좌표여야 합니다.
 
+이번 검증에는 [Roboflow Universe의 Warehouse Safety v7](https://universe.roboflow.com/s-workspace-zi5d1/warehouse-safety-rhspm-3u50l/dataset/7)을 사용했습니다. 데이터셋 제공 파일에 표시된 라이선스는 CC BY 4.0이며, 저장소에는 데이터 원본을 포함하지 않습니다.
+
 ```text
 data/warehouse/
 ├── data.yaml
@@ -149,6 +153,8 @@ python train.py --data data/warehouse/data.yaml --device 0 --epochs 80 --batch 8
 `--check-only`는 두 클래스, split 이미지 폴더와 라벨 폴더 존재를 확인합니다. 각 라벨의 품질·누락·좌표 유효성에 대한 전체 검사는 아니며 Ultralytics의 학습 검사와 별도 수동 검토가 필요합니다. `configs/train.yaml`에서 seed, patience, batch 등을 조정합니다. VRAM 부족 시 batch를 줄이세요. 같은 영상의 인접 프레임이 train/val에 섞이지 않도록 촬영 단위로 분리하고, 증강 이미지는 원본과 같은 split에 두세요.
 
 가중치는 기본적으로 `runs/train/warehouse_yolo26s/weights/best.pt`에 생성됩니다. 동일 이름의 기존 학습 결과가 있으면 Ultralytics가 새 이름을 사용할 수 있으므로 마지막 콘솔의 실제 경로를 확인하세요.
+
+2026-09-17 실행에서는 53 epoch에서 early stopping됐고, 최고 checkpoint는 38번째 epoch였습니다. 별도 test split 결과는 전체 mAP50-95 0.782, forklift mAP50-95 0.685, person mAP50-95 0.879였습니다. 이 데이터의 test split은 39장이고 forklift 정답이 7개뿐입니다. 전체 조건과 외부 영상 실패 사례는 [검증 문서](docs/VALIDATION.md)에 기록했습니다.
 
 ## 6. 클립 재추출
 

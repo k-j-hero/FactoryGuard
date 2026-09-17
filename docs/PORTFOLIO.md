@@ -12,19 +12,21 @@
 - 두 임계값과 최소 관측 시간: 경계에서의 흔들림과 짧은 오탐을 줄이기 위한 규칙.
 - CSV와 MP4: DB/대시보드 없이 실행 결과를 바로 검토.
 
-## 실제 실험 후 채울 항목
+## 실제 실험 기록
 
 | 항목 | 현재 기록 |
 | --- | --- |
-| 데이터 원본/버전/라이선스 | 미확보 |
-| 촬영 단위 train/val/test 분리 | 미확인 |
+| 데이터 원본/버전/라이선스 | Roboflow Warehouse Safety v7, CC BY 4.0, 906장 |
+| 촬영 단위 train/val/test 분리 | 원본 frame ID의 split 간 중복 없음. 제공 split 사용 |
 | 하드웨어, Python, PyTorch, Ultralytics | RTX 5060 Ti 16GB, Python 3.12.14, PyTorch 2.12.1+cu130, Ultralytics 8.4.154 |
-| 학습 epoch / seed / checkpoint | 미학습 |
-| person / forklift별 precision, recall, mAP50-95 | 미측정 |
-| 별도 테스트 영상 길이/조건 | 미확보 |
-| 후보 수 / 검토상 유효 후보 / 오탐 / 놓친 근접 구간 | 미측정 |
-| 처리 시간 / 처리 FPS | 300프레임 6.715초, 약 44.7 FPS (1280×720 detection-only 샘플 1회) |
-| 공개 가능한 데모 영상 | 미확보 |
+| 학습 epoch / seed / checkpoint | 53 epoch early stopping / 42 / epoch 38 best.pt |
+| person test P/R/mAP50-95 | 0.969 / 0.935 / 0.879 (77개 정답) |
+| forklift test P/R/mAP50-95 | 0.680 / 1.000 / 0.685 (7개 정답, 작은 표본) |
+| 별도 테스트 영상 길이/조건 | Pexels 4294434, 4K 25 FPS, 첫 300프레임 12초, 지상 시점 |
+| 외부 영상 결과 | person 로그 39행, forklift 0행, 후보 0건. 명백한 forklift 누락 |
+| 처리 시간 / 처리 FPS | best.pt 4K: 300프레임 19.88초, 약 15.1 FPS. pretrained 720p: 약 44.7 FPS |
+| 출력 파이프라인 증명 | test 정지 장면 반복 영상에서 이벤트 1건과 clip 1개 생성 |
+| 공개 가능한 데모 영상 | Pexels 라이선스와 재배포 조건 확인 후 결정 필요 |
 
 ## 평가 방식
 
@@ -33,6 +35,8 @@
 ## 사례 기록
 
 각 사례에 원본 구간, annotated clip, 적용 임계값, 결과, 원인을 함께 기록한다. 정상 예시뿐 아니라 가림, ID 변경, 다른 깊이의 객체가 가까워 보이는 실패 사례도 포함한다.
+
+첫 외부 영상은 사람 뒤에서 지게차로 접근하는 장면이다. 학습 데이터의 bird's-eye 시점과 달라 forklift가 전 프레임에서 누락됐다. 이 실패로 validation/test 수치만으로 실제 영상 성능을 주장할 수 없음을 확인했다. 다음 데이터 보강은 지상 시점, 부분 가림, 사람이 지게차 앞에 겹치는 장면을 우선한다.
 
 ## 설명할 수 있는 한계
 
