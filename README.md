@@ -22,6 +22,16 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 
 현재 검증 수치와 해석 범위는 [docs/VALIDATION.md](docs/VALIDATION.md)를 확인하세요. test split의 forklift 정답이 7개뿐이므로 해당 수치를 일반적인 현장 성능으로 해석하지 않습니다.
 
+## 결과 미리보기
+
+![FactoryGuard potential near-miss candidate 화면](docs/assets/pipeline-proof.jpg)
+
+실제 `best.pt`와 ByteTrack으로 생성한 출력 파이프라인 증명 화면입니다. 반복한 test 정지 장면과 완화한 임계값을 사용했으므로 실제 접근 성능 측정 결과는 아닙니다. 원본 장면: Warehouse Safety v7, CC BY 4.0.
+
+![YOLO26s 학습 곡선](docs/assets/training-results.png)
+
+학습은 53 epoch에서 early stopping됐고 최고 checkpoint는 38번째 epoch였습니다.
+
 **처음 보는 경우:** [결과물을 어디서 어떻게 보는지](docs/VIEWING.md)부터 확인하세요.
 
 **테스트할 영상이 없다면:** [공개 샘플로 첫 실제 추론 실행](docs/FIRST_DEMO.md). 전용 가상환경에서 설치부터 짧은 결과 영상 생성까지 진행하는 명령을 제공합니다.
