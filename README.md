@@ -20,6 +20,8 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 
 현재 검증 범위는 [docs/VALIDATION.md](docs/VALIDATION.md)를 확인하세요. 실제 학습 결과나 탐지 성능 수치를 아직 보고하지 않습니다.
 
+**처음 보는 경우:** [결과물을 어디서 어떻게 보는지](docs/VIEWING.md)부터 확인하세요.
+
 ## 프로젝트 구조
 
 ```text
