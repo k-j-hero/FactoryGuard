@@ -14,6 +14,8 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 - [x] annotated MP4, tracks.csv, events.csv, events.jsonl, summary.json
 - [x] 이벤트 전후 annotated MP4 클립 추출 및 별도 재추출 명령
 - [x] YOLO 형식 데이터 경로 확인 및 YOLO26s 학습 명령
+- [x] YOLO 라벨·누락 파일·split 중복을 검사하는 데이터 감사 도구
+- [x] W&B 실시간 학습 로깅과 기존 Ultralytics run 가져오기
 - [x] VS Code 작업 공간/디버그 설정, 단위 테스트, GitHub Actions 설정
 - [x] 사전학습 YOLO26s + ByteTrack GPU 실행 검증 (person detection-only)
 - [x] Warehouse Safety v7로 YOLO26s 학습 및 별도 test split 평가
@@ -32,6 +34,10 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 
 학습은 53 epoch에서 early stopping됐고 최고 checkpoint는 38번째 epoch였습니다.
 
+![지상 시점 데이터를 보강한 YOLO26s 학습 곡선](docs/assets/combined-training-results.png)
+
+지상 시점 데이터를 보강한 통합 학습은 80 epoch를 완료했고 최고 checkpoint는 75번째 epoch였습니다. validation과 별도 test 결과는 [검증 문서](docs/VALIDATION.md)에 구분해 기록했습니다.
+
 **처음 보는 경우:** [결과물을 어디서 어떻게 보는지](docs/VIEWING.md)부터 확인하세요.
 
 **테스트할 영상이 없다면:** [공개 샘플로 첫 실제 추론 실행](docs/FIRST_DEMO.md). 전용 가상환경에서 설치부터 짧은 결과 영상 생성까지 진행하는 명령을 제공합니다.
@@ -42,13 +48,15 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 FactoryGuard/
 ├── infer.py                    # 영상 탐지·추적·이벤트 파이프라인
 ├── train.py                    # 데이터 경로 확인 및 fine-tuning
+├── audit_dataset.py            # YOLO 라벨 품질과 split 중복 검사
+├── log_wandb.py                # 완료된 학습 결과를 W&B run으로 가져오기
 ├── extract_events.py           # CSV 기반 클립 재추출
 ├── factoryguard/
 │   ├── config.py               # 설정 검증, 모델 클래스 매핑
 │   ├── proximity.py            # 화면상 근접도와 pair별 이벤트 상태
 │   ├── pipeline.py             # 순차 프레임 처리 및 결과 기록
 │   └── clips.py                # annotated MP4 클립 추출
-├── configs/                    # 추론, 학습, ByteTrack, 데이터 예시
+├── configs/                    # 추론, 학습, ByteTrack, 단일/통합 데이터 예시
 ├── tests/                      # 규칙 및 영상 저장 통합 테스트
 ├── docs/                       # 검증 상태, 포트폴리오 기록 양식
 ├── .vscode/launch.json
@@ -143,7 +151,7 @@ normalized_proximity = ||person_anchor - forklift_anchor|| / sqrt(width² + heig
 
 Warehouse Safety 계열의 **person/forklift 두 클래스, YOLO detection 형식**으로 내려받은 데이터를 로컬에 풀어 놓습니다. 접근 키나 다운로드 자동화는 필요하지 않습니다. 라벨은 `class_id x_center y_center width height` 형식의 정규화 좌표여야 합니다.
 
-이번 검증에는 [Roboflow Universe의 Warehouse Safety v7](https://universe.roboflow.com/s-workspace-zi5d1/warehouse-safety-rhspm-3u50l/dataset/7)을 사용했습니다. 데이터셋 제공 파일에 표시된 라이선스는 CC BY 4.0이며, 저장소에는 데이터 원본을 포함하지 않습니다.
+이번 검증에는 [Roboflow Universe의 Warehouse Safety v7](https://universe.roboflow.com/s-workspace-zi5d1/warehouse-safety-rhspm-3u50l/dataset/7)을 사용했습니다. 지상·측면 시점 보강 실험에는 [Forklift v1](https://universe.roboflow.com/helmetaiworkspace/forklift-dsitv-yhncw/dataset/1)을 추가했습니다. 두 페이지의 제공 파일은 CC BY 4.0으로 표시하며, 저장소에는 데이터 원본을 포함하지 않습니다.
 
 ```text
 data/warehouse/
@@ -156,17 +164,47 @@ data/warehouse/
 `configs/data.example.yaml`을 참고하되 **실제 라벨의 클래스 ID 순서를 유지**하세요. 이 프로젝트는 `path`를 `data.yaml` 기준으로, split 경로를 `path` 기준으로 해석합니다. 내보낸 YAML에 `../train/images`가 있는데 실제 폴더는 YAML 옆이라면 `train/images`로 수정하세요. 절대 경로도 가능합니다. 자동으로 다른 폴더를 추측하지 않습니다.
 
 ```bash
+python audit_dataset.py --data data/warehouse/data.yaml --output reports/warehouse-audit.json
 python train.py --data data/warehouse/data.yaml --check-only
 python train.py --data data/warehouse/data.yaml --device 0 --epochs 80 --batch 8
 ```
 
-`--check-only`는 두 클래스, split 이미지 폴더와 라벨 폴더 존재를 확인합니다. 각 라벨의 품질·누락·좌표 유효성에 대한 전체 검사는 아니며 Ultralytics의 학습 검사와 별도 수동 검토가 필요합니다. `configs/train.yaml`에서 seed, patience, batch 등을 조정합니다. VRAM 부족 시 batch를 줄이세요. 같은 영상의 인접 프레임이 train/val에 섞이지 않도록 촬영 단위로 분리하고, 증강 이미지는 원본과 같은 split에 두세요.
+`audit_dataset.py`는 이미지-라벨 쌍, YOLO 좌표, 클래스 수, 빈 라벨, 파일 내용이 완전히 같은 split 간 중복, Roboflow 파일명 기반 원본 후보 중복을 검사합니다. 파일명 검사는 보수적인 휴리스틱이라 최종적으로는 촬영 영상 단위 분리를 사람이 확인해야 합니다.
 
-가중치는 기본적으로 `runs/train/warehouse_yolo26s/weights/best.pt`에 생성됩니다. 동일 이름의 기존 학습 결과가 있으면 Ultralytics가 새 이름을 사용할 수 있으므로 마지막 콘솔의 실제 경로를 확인하세요.
+`train.py --check-only`는 두 클래스와 모든 split 경로가 학습기에서 열리는지 확인합니다. `configs/train.yaml`에서 seed, patience, batch 등을 조정합니다. VRAM 부족 시 batch를 줄이세요. 같은 영상의 인접 프레임이 train/val에 섞이지 않도록 촬영 단위로 분리하고, 증강 이미지는 원본과 같은 split에 두세요.
 
-2026-09-17 실행에서는 53 epoch에서 early stopping됐고, 최고 checkpoint는 38번째 epoch였습니다. 별도 test split 결과는 전체 mAP50-95 0.782, forklift mAP50-95 0.685, person mAP50-95 0.879였습니다. 이 데이터의 test split은 39장이고 forklift 정답이 7개뿐입니다. 전체 조건과 외부 영상 실패 사례는 [검증 문서](docs/VALIDATION.md)에 기록했습니다.
+두 로컬 데이터셋을 `data/warehouse`, `data/forklift_ground`에 두었다면 통합 설정을 그대로 사용할 수 있습니다.
 
-## 6. 클립 재추출
+```bash
+python audit_dataset.py --data configs/data.combined.yaml --output reports/combined-dataset-audit.json
+python train.py --data configs/data.combined.yaml --config configs/train.combined.yaml --check-only
+python train.py --data configs/data.combined.yaml --config configs/train.combined.yaml --device 0
+```
+
+단일 데이터 학습 가중치는 기본적으로 `runs/train/warehouse_yolo26s/weights/best.pt`, 통합 데이터 학습 가중치는 `runs/train/combined_yolo26s/weights/best.pt`에 생성됩니다. 동일 이름의 기존 학습 결과가 있으면 실행을 중단하거나 설정의 `name`을 바꾸세요.
+
+2026-09-17 baseline 실행은 53 epoch에서 early stopping됐고, 최고 checkpoint는 38번째 epoch였습니다. 지상 시점 데이터를 추가한 통합 학습은 80 epoch를 완료했고 75번째 epoch가 선택됐습니다. 통합 test의 전체 mAP50-95는 0.664, forklift는 0.628, person은 0.699였습니다. 서로 다른 test 구성을 섞어 해석하지 않도록 전체 조건과 외부 영상 결과를 [검증 문서](docs/VALIDATION.md)에 기록했습니다.
+
+## 6. Weights & Biases로 실험 기록
+
+새 학습을 W&B에 실시간 기록하려면 먼저 한 번 로그인한 뒤 `--wandb`를 지정합니다. API key는 코드, `.env`, 채팅에 남기지 마세요.
+
+```bash
+wandb login
+python train.py --data configs/data.combined.yaml --config configs/train.combined.yaml --device 0 --wandb --wandb-project FactoryGuard
+```
+
+이 명령은 epoch별 loss, Precision, Recall, mAP, 곡선 이미지와 최종 `best.pt` artifact를 기록합니다. 인터넷 없이 로컬 run만 만들려면 `--wandb-mode offline`을 추가하세요.
+
+이미 끝난 Ultralytics 학습도 `results.csv`를 다시 학습하지 않고 가져올 수 있습니다.
+
+```bash
+python log_wandb.py --run-dir runs/train/combined_yolo26s --project FactoryGuard --name combined-yolo26s-ground-aug --mode online --evaluation reports/model-evaluation.json
+```
+
+모델 파일까지 artifact로 올릴 때만 `--upload-model`을 추가합니다. 오프라인 가져오기는 `--mode offline`을 사용하고, 출력된 `wandb sync <offline-run-path>`를 로그인 후 실행하세요. 저장소는 `wandb/`와 `runs/`를 커밋하지 않습니다.
+
+## 7. 클립 재추출
 
 ```bash
 python extract_events.py --video runs/site01/annotated.mp4 --events runs/site01/events.csv --output runs/site01/clips_long --pre-sec 3 --post-sec 3
@@ -174,7 +212,7 @@ python extract_events.py --video runs/site01/annotated.mp4 --events runs/site01/
 
 영상 길이를 넘는 구간은 잘라냅니다. 영상과 CSV는 반드시 같은 실행 결과를 사용하세요. 한 이벤트씩 읽어 메모리를 제한하므로 이벤트 수가 많으면 추출 시간이 늘어납니다. 중첩 이벤트는 별도 클립으로 남깁니다.
 
-## 7. 테스트와 포트폴리오 완성 순서
+## 8. 테스트와 포트폴리오 완성 순서
 
 ```bash
 python -m unittest discover -s tests -v
@@ -206,6 +244,7 @@ python -m unittest discover -s tests -v
 
 - [Ultralytics YOLO26](https://docs.ultralytics.com/models/yolo26/): YOLO26s 모델 및 학습 API.
 - [Ultralytics tracking](https://docs.ultralytics.com/modes/track/): `model.track`, ByteTrack, `persist=True`.
+- [Ultralytics W&B integration](https://docs.ultralytics.com/integrations/weights-biases/): 학습 metrics와 model artifact 자동 기록.
 - [YOLO detection dataset format](https://docs.ultralytics.com/datasets/detect/): 데이터와 라벨 형식.
 - [Ultralytics licensing](https://www.ultralytics.com/license): 의존 모델/소프트웨어 사용 조건.
 

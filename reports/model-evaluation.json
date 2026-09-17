@@ -1,0 +1,135 @@
+{
+  "generated_at_utc": "2026-09-17T08:47:11.014495+00:00",
+  "settings": {
+    "split": "test",
+    "imgsz": 640,
+    "batch": 8,
+    "device": 0
+  },
+  "evaluations": {
+    "original_on_ground_test": {
+      "model": "runs/train/warehouse_yolo26s/weights/best.pt",
+      "data": "data/forklift_ground/data.yaml",
+      "all": {
+        "precision": 0.1031550595340165,
+        "recall": 0.09249471458773784,
+        "map50": 0.029335640694219386,
+        "map50_95": 0.007128776140522394
+      },
+      "per_class": {
+        "forklift": {
+          "precision": 0.1597906219190124,
+          "recall": 0.13953488372093023,
+          "map50": 0.04439997342810642,
+          "map50_95": 0.008077088509456877
+        },
+        "person": {
+          "precision": 0.04651949714902063,
+          "recall": 0.045454545454545456,
+          "map50": 0.01427130796033235,
+          "map50_95": 0.0061804637715879105
+        }
+      },
+      "speed_ms_per_image": {
+        "preprocess": 0.3747309520327863,
+        "inference": 4.029204762143006,
+        "loss": 0.0006095237733374926,
+        "postprocess": 0.6227500002534638
+      },
+      "output": "runs/eval/original_on_ground_test"
+    },
+    "combined_on_ground_test": {
+      "model": "runs/train/combined_yolo26s/weights/best.pt",
+      "data": "data/forklift_ground/data.yaml",
+      "all": {
+        "precision": 0.8534179040163341,
+        "recall": 0.7302197569402485,
+        "map50": 0.7703346168392768,
+        "map50_95": 0.46864254287096774
+      },
+      "per_class": {
+        "forklift": {
+          "precision": 0.9188615451855093,
+          "recall": 0.9534883720930233,
+          "map50": 0.947631485587583,
+          "map50_95": 0.6365075354251376
+        },
+        "person": {
+          "precision": 0.787974262847159,
+          "recall": 0.5069511417874738,
+          "map50": 0.5930377480909707,
+          "map50_95": 0.30077755031679787
+        }
+      },
+      "speed_ms_per_image": {
+        "preprocess": 0.14424761909703238,
+        "inference": 3.0494928571334596,
+        "loss": 0.0005261903251743032,
+        "postprocess": 0.6071166665476214
+      },
+      "output": "runs/eval/combined_on_ground_test"
+    },
+    "combined_on_warehouse_test": {
+      "model": "runs/train/combined_yolo26s/weights/best.pt",
+      "data": "data/warehouse/data.yaml",
+      "all": {
+        "precision": 0.8164169471525874,
+        "recall": 0.9877035017835727,
+        "map50": 0.9089673221800134,
+        "map50_95": 0.8448438699553593
+      },
+      "per_class": {
+        "forklift": {
+          "precision": 0.683399502359181,
+          "recall": 1.0,
+          "map50": 0.8308571428571426,
+          "map50_95": 0.7861214285714284
+        },
+        "person": {
+          "precision": 0.9494343919459938,
+          "recall": 0.9754070035671454,
+          "map50": 0.9870775015028843,
+          "map50_95": 0.90356631133929
+        }
+      },
+      "speed_ms_per_image": {
+        "preprocess": 0.4737615383465965,
+        "inference": 3.8260641026098687,
+        "loss": 0.0005256411103077998,
+        "postprocess": 0.556217948682248
+      },
+      "output": "runs/eval/combined_on_warehouse_test"
+    },
+    "combined_on_combined_test": {
+      "model": "runs/train/combined_yolo26s/weights/best.pt",
+      "data": "configs/data.combined.yaml",
+      "all": {
+        "precision": 0.9231454875027134,
+        "recall": 0.8557974153189097,
+        "map50": 0.8932965996633746,
+        "map50_95": 0.6637465619512314
+      },
+      "per_class": {
+        "forklift": {
+          "precision": 0.8873753535001981,
+          "recall": 0.94,
+          "map50": 0.9239412294978319,
+          "map50_95": 0.628416931909966
+        },
+        "person": {
+          "precision": 0.9589156215052288,
+          "recall": 0.7715948306378195,
+          "map50": 0.8626519698289173,
+          "map50_95": 0.6990761919924968
+        }
+      },
+      "speed_ms_per_image": {
+        "preprocess": 0.14663950612345986,
+        "inference": 3.630235802344863,
+        "loss": 0.0005370369942766833,
+        "postprocess": 0.5566777777678426
+      },
+      "output": "runs/eval/combined_on_combined_test"
+    }
+  }
+}

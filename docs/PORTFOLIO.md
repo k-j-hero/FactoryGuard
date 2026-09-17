@@ -11,20 +11,23 @@
 - 화면 대각선 정규화: 같은 화면을 동일 비율로 리사이즈해도 근접도 값 유지.
 - 두 임계값과 최소 관측 시간: 경계에서의 흔들림과 짧은 오탐을 줄이기 위한 규칙.
 - CSV와 MP4: DB/대시보드 없이 실행 결과를 바로 검토.
+- Weights & Biases: 학습 곡선, 설정, 평가표, 모델 artifact를 run 단위로 재현·비교.
 
 ## 실제 실험 기록
 
 | 항목 | 현재 기록 |
 | --- | --- |
-| 데이터 원본/버전/라이선스 | Roboflow Warehouse Safety v7, CC BY 4.0, 906장 |
-| 촬영 단위 train/val/test 분리 | 원본 frame ID의 split 간 중복 없음. 제공 split 사용 |
+| 데이터 원본/버전/라이선스 | Roboflow Warehouse Safety v7 906장 + Forklift v1 421장, 모두 CC BY 4.0 표시 |
+| 데이터 감사 | 통합 train/val/test 1,083/163/81장, 누락·좌표 오류·정확히 같은 파일의 split 중복 0건 |
 | 하드웨어, Python, PyTorch, Ultralytics | RTX 5060 Ti 16GB, Python 3.12.14, PyTorch 2.12.1+cu130, Ultralytics 8.4.154 |
-| 학습 epoch / seed / checkpoint | 53 epoch early stopping / 42 / epoch 38 best.pt |
-| person test P/R/mAP50-95 | 0.969 / 0.935 / 0.879 (77개 정답) |
-| forklift test P/R/mAP50-95 | 0.680 / 1.000 / 0.685 (7개 정답, 작은 표본) |
+| 통합 학습 epoch / seed / checkpoint | 80 epoch / 42 / epoch 75 best.pt, 약 26.5분 |
+| 통합 test 전체 P/R/mAP50-95 | 0.923 / 0.856 / 0.664 (171개 정답) |
+| 통합 test forklift P/R/mAP50-95 | 0.887 / 0.940 / 0.628 (50개 정답) |
+| 지상 시점 forklift 개선 | baseline Recall/mAP50-95 0.140/0.008 → 통합 0.953/0.637 (43개 정답) |
 | 별도 테스트 영상 길이/조건 | Pexels 4294434, 4K 25 FPS, 첫 300프레임 12초, 지상 시점 |
-| 외부 영상 결과 | person 로그 39행, forklift 0행, 후보 0건. 명백한 forklift 누락 |
-| 처리 시간 / 처리 FPS | best.pt 4K: 300프레임 19.88초, 약 15.1 FPS. pretrained 720p: 약 44.7 FPS |
+| 외부 영상 결과 | 640 입력에서 person 331행, forklift 340행, 후보/clip 2건. 실제 지게차 존재는 회복했으나 과대 박스·추가 오탐 존재 |
+| 처리 시간 | 통합 best.pt 4K 300프레임: 640 입력 35.52초, 1280 입력 46.14초 |
+| W&B | 기존 80 epoch, 설정, 곡선, 평가표를 오프라인 run으로 import 검증. 온라인 공유는 sync 필요 |
 | 출력 파이프라인 증명 | test 정지 장면 반복 영상에서 이벤트 1건과 clip 1개 생성 |
 | 공개 가능한 데모 영상 | Pexels 라이선스와 재배포 조건 확인 후 결정 필요 |
 
@@ -36,7 +39,7 @@
 
 각 사례에 원본 구간, annotated clip, 적용 임계값, 결과, 원인을 함께 기록한다. 정상 예시뿐 아니라 가림, ID 변경, 다른 깊이의 객체가 가까워 보이는 실패 사례도 포함한다.
 
-첫 외부 영상은 사람 뒤에서 지게차로 접근하는 장면이다. 학습 데이터의 bird's-eye 시점과 달라 forklift가 전 프레임에서 누락됐다. 이 실패로 validation/test 수치만으로 실제 영상 성능을 주장할 수 없음을 확인했다. 다음 데이터 보강은 지상 시점, 부분 가림, 사람이 지게차 앞에 겹치는 장면을 우선한다.
+첫 외부 영상은 사람 뒤에서 지게차로 접근하는 장면이다. baseline은 forklift를 전 프레임에서 놓쳤고, 지상 시점 보강 모델은 실제 지게차 존재와 후보 구간을 회복했다. 다만 박스가 실제 객체보다 크게 확장되고 1280 입력에서는 중복·ID 분할이 늘었다. 이 결과로 test mAP와 이벤트 품질을 분리해 기록하고, 후보는 사람이 검토해야 한다는 설계 원칙을 유지한다.
 
 ## 설명할 수 있는 한계
 

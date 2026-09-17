@@ -2,3 +2,4 @@ ultralytics>=8.4.63,<9
 opencv-python>=4.10,<5
 PyYAML>=6.0.2,<7
 lap>=0.5.12,<1
+wandb>=0.19,<1

@@ -1,0 +1,15 @@
+# Keep each source's original split to avoid moving related images between
+# train, validation, and test. The data/ directory remains gitignored.
+path: ../data
+train:
+  - warehouse/train/images
+  - forklift_ground/train/images
+val:
+  - warehouse/valid/images
+  - forklift_ground/valid/images
+test:
+  - warehouse/test/images
+  - forklift_ground/test/images
+names:
+  0: forklift
+  1: person

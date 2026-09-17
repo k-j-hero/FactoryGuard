@@ -12,8 +12,14 @@
 | 핵심 규칙 | factoryguard/proximity.py | 하단 중심 좌표, 정규화, 진입/종료 조건 |
 | 실행 설정 | configs/default.yaml | 장치, 임계값, 최소 관측 시간, 클립 앞뒤 길이 |
 | 학습 곡선 | runs/train/warehouse_yolo26s/results.png | loss와 validation 지표의 epoch별 변화 |
+| 통합 학습 곡선 | runs/train/combined_yolo26s/results.png | 지상 시점 보강 후 loss와 validation 지표 변화 |
+| 데이터 감사 보고서 | reports/combined-dataset-audit.json | split별 이미지·객체 수, 누락·좌표 오류·중복 여부 |
+| 모델 비교 원시 수치 | reports/model-evaluation.json | baseline/통합 모델의 지상 시점·원래 test 성능 비교 |
+| W&B 오프라인 run | runs/train/combined_yolo26s/wandb/offline-run-20260918_083036-wxl58ot9 | 80 epoch metrics, 설정, 곡선 이미지, 평가표. `wandb sync` 후 웹에서 확인 |
+| W&B 자동 callback 증명 | runs/train/wandb/offline-run-20260918_083410-1fscae27 | 새 학습의 metrics·곡선·best.pt artifact 기록 여부 |
 | test 평가 그림 | runs/eval/warehouse_test/ | confusion matrix, PR/F1 곡선, 예측 샘플 |
-| 외부 영상 결과 | runs/trained_demo_20260917/annotated.mp4 | 사람 탐지와 지게차 누락 실패 사례 |
+| baseline 외부 영상 | runs/trained_demo_20260917/annotated.mp4 | 사람 탐지와 지게차 누락 실패 사례 |
+| 통합 모델 외부 영상 | runs/combined_demo_20260917/annotated.mp4 | 지게차 존재 회복, 후보 2건, 과대 박스·오탐도 함께 확인 |
 | 이벤트 파이프라인 증명 | runs/pipeline_proof_relaxed_20260917/ | annotated MP4, 이벤트 CSV, 실제 추출 clip |
 
 ## 첫 영상 실행 후 볼 것

@@ -1,4 +1,5 @@
 import argparse
+import os
 from pathlib import Path
 
 import yaml
@@ -23,18 +24,22 @@ def prepare_data(path, destination):
         value = data.get(split)
         if not value and split == "test":
             continue
-        if not isinstance(value, str) or not value:
-            raise ValueError(f"Expected a directory path for {split}")
-        split_path = (root / value).resolve()
-        if not split_path.is_dir():
-            raise ValueError(f"Missing {split} image directory: {split_path}. "
-                             "Correct path/train/val/test relative to data.yaml; see README.")
-        if not any(p.suffix.lower() in {".jpg", ".jpeg", ".png", ".bmp", ".webp"} for p in split_path.rglob("*")):
-            raise ValueError(f"No images in {split_path}")
-        label_dir = split_path.parent / "labels"
-        if not label_dir.is_dir() or not any(label_dir.rglob("*.txt")):
-            raise ValueError(f"Missing YOLO labels in {label_dir}")
-        normalized[split] = str(split_path)
+        values = [value] if isinstance(value, str) else value
+        if not isinstance(values, list) or not values or not all(isinstance(item, str) and item for item in values):
+            raise ValueError(f"Expected one or more directory paths for {split}")
+        split_paths = []
+        for item in values:
+            split_path = (root / item).resolve()
+            if not split_path.is_dir():
+                raise ValueError(f"Missing {split} image directory: {split_path}. "
+                                 "Correct path/train/val/test relative to data.yaml; see README.")
+            if not any(p.suffix.lower() in {".jpg", ".jpeg", ".png", ".bmp", ".webp"} for p in split_path.rglob("*")):
+                raise ValueError(f"No images in {split_path}")
+            label_dir = split_path.parent / "labels"
+            if not label_dir.is_dir() or not any(label_dir.rglob("*.txt")):
+                raise ValueError(f"Missing YOLO labels in {label_dir}")
+            split_paths.append(str(split_path))
+        normalized[split] = split_paths[0] if isinstance(value, str) else split_paths
     destination = Path(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(yaml.safe_dump(normalized, sort_keys=False), encoding="utf-8")
@@ -49,6 +54,10 @@ def main():
     parser.add_argument("--epochs", type=int)
     parser.add_argument("--batch", type=int)
     parser.add_argument("--check-only", action="store_true", help="Validate dataset layout without loading YOLO")
+    parser.add_argument("--wandb", action="store_true", help="Log training metrics and best.pt to Weights & Biases")
+    parser.add_argument("--wandb-project", default="FactoryGuard")
+    parser.add_argument("--wandb-entity")
+    parser.add_argument("--wandb-mode", choices=("online", "offline"), default="online")
     args = parser.parse_args()
     config = read_yaml(args.config)
     for key in ("device", "epochs", "batch"):
@@ -63,11 +72,45 @@ def main():
     print(f"Resolved dataset: {data}")
     if args.check_only:
         return
+    wandb_run = None
+    if args.wandb:
+        ultralytics_settings = project / "ultralytics-settings"
+        ultralytics_settings.mkdir(parents=True, exist_ok=True)
+        os.environ.setdefault("YOLO_CONFIG_DIR", str(ultralytics_settings))
+        wandb_support = project / "wandb-support"
+        os.environ.setdefault("WANDB_CACHE_DIR", str(wandb_support / "cache"))
+        os.environ.setdefault("WANDB_CONFIG_DIR", str(wandb_support / "config"))
+        os.environ.setdefault("WANDB_DATA_DIR", str(wandb_support / "data"))
+        import wandb
+        from ultralytics import settings
+
+        settings.update({"wandb": True})
+        wandb_config = {"dataset": str(data), "model": model_name, **config}
+        wandb_run = wandb.init(
+            project=args.wandb_project,
+            entity=args.wandb_entity,
+            name=str(config.get("name", "train")),
+            mode=args.wandb_mode,
+            job_type="train",
+            config=wandb_config,
+            dir=str(project),
+        )
     from ultralytics import YOLO
     model = YOLO(model_name)
-    model.train(data=str(data), **config)
-    print(f"Training outputs: {model.trainer.save_dir}")
-    print(f"Best checkpoint: {Path(model.trainer.save_dir) / 'weights' / 'best.pt'}")
+    failed = False
+    try:
+        model.train(data=str(data), **config)
+        print(f"Training outputs: {model.trainer.save_dir}")
+        print(f"Best checkpoint: {Path(model.trainer.save_dir) / 'weights' / 'best.pt'}")
+    except Exception:
+        failed = True
+        raise
+    finally:
+        if wandb_run is not None:
+            import wandb
+
+            if wandb.run is not None:
+                wandb.finish(exit_code=1 if failed else 0)
 
 
 if __name__ == "__main__":
