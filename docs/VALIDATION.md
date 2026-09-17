@@ -6,7 +6,7 @@
 
 - Python 3.12.14 환경에서 전체 Python 파일 문법 검사 통과.
 - 근접 규칙, MP4 저장, 데이터 감사, 통합 데이터 경로, W&B import 변환 테스트 15개가 로컬 Windows에서 통과.
-- 초기 코드 커밋 `650d54a`의 [GitHub Actions 실행](https://github.com/k-j-hero/FactoryGuard/actions/runs/35177293320)은 당시 9개 테스트를 통과했다. 최신 15개 테스트의 Actions 링크는 이번 변경을 push한 뒤 갱신한다.
+- 커밋 `0b2fd3c`의 [GitHub Actions 실행](https://github.com/k-j-hero/FactoryGuard/actions/runs/35287626070)에서 최신 15개 테스트가 모두 통과했다.
 - MP4 통합 테스트는 합성 입력과 스크립트 탐지 결과로 annotated MP4, 이벤트 CSV, 이벤트 클립의 생성·재생·프레임 수를 검사한다. 실제 YOLO 정확도 테스트는 아니다.
 
 ## 학습 데이터
