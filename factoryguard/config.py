@@ -11,7 +11,8 @@ DEFAULTS = {
     "require_forklift": False, "person_names": ["person"],
     "forklift_names": ["forklift"],
     "proximity": {"enter_threshold": 0.08, "exit_threshold": 0.11,
-                  "min_duration_sec": 0.5, "lost_tolerance_sec": 0.3},
+                  "min_duration_sec": 0.5, "lost_tolerance_sec": 0.3,
+                  "anchor_mode": "bottom_center"},
     "clips": {"enabled": True, "pre_sec": 2.0, "post_sec": 2.0},
 }
 
@@ -36,14 +37,18 @@ def load_config(path):
         else:
             config[key] = value
     p = config["proximity"]
-    for key, value in {**p, "pre_sec": config["clips"]["pre_sec"],
-                       "post_sec": config["clips"]["post_sec"]}.items():
+    numeric = {key: p[key] for key in (
+        "enter_threshold", "exit_threshold", "min_duration_sec", "lost_tolerance_sec")}
+    numeric.update(pre_sec=config["clips"]["pre_sec"], post_sec=config["clips"]["post_sec"])
+    for key, value in numeric.items():
         if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
             raise ValueError(f"{key} must be a finite non-negative number")
     if not 0 < p["enter_threshold"] < p["exit_threshold"] <= 1:
         raise ValueError("Require 0 < enter_threshold < exit_threshold <= 1")
     if p["min_duration_sec"] <= 0:
         raise ValueError("min_duration_sec must be positive")
+    if p["anchor_mode"] not in {"bottom_center", "center"}:
+        raise ValueError("anchor_mode must be 'bottom_center' or 'center'")
     for key in ("conf", "iou"):
         if not isinstance(config[key], (int, float)) or not 0 < config[key] <= 1:
             raise ValueError(f"{key} must be in (0, 1]")

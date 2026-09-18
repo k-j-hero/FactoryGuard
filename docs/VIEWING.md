@@ -9,7 +9,9 @@
 | 프로젝트 설명 | VS Code에서 README.md 선택 후 Ctrl+Shift+V | 구조, 설치, 실행 순서, 한계 |
 | 공개 저장소 | https://github.com/k-j-hero/FactoryGuard | 업로드된 코드와 변경 이력 |
 | 자동 테스트 | GitHub의 Actions → 실행 제목 → tests | 초록 체크와 테스트 로그; 실제 탐지 성능은 별도 |
-| 핵심 규칙 | factoryguard/proximity.py | 하단 중심 좌표, 정규화, 진입/종료 조건 |
+| 핵심 규칙 | factoryguard/proximity.py | 지상 시점 하단 중앙/탑다운 중심 좌표, 정규화, 진입/종료 조건 |
+| 탑다운 MVP 범위 | docs/TOPDOWN_MVP.md | 전용 모델·중심점 근접도·실행법·완성 조건 |
+| 탑다운 출력 예시 | docs/assets/topdown-proof.jpg | Warehouse 전용 모델의 person/forklift 박스와 ID |
 | 실행 설정 | configs/default.yaml | 장치, 임계값, 최소 관측 시간, 클립 앞뒤 길이 |
 | 학습 곡선 | runs/train/warehouse_yolo26s/results.png | loss와 validation 지표의 epoch별 변화 |
 | 통합 학습 곡선 | runs/train/combined_yolo26s/results.png | 지상 시점 보강 후 loss와 validation 지표 변화 |
@@ -29,6 +31,7 @@
 | 안정형 추적 외부 영상 | runs/combined_stable_20260918/annotated.mp4 | ID·겹침 감소와 남아 있는 과대 forklift 박스를 함께 확인 |
 | 정제 모델 외부 영상 | runs/curated_demo_20260918/annotated.mp4 | 과대 박스 감소와 지게차 탐지 프레임 감소를 함께 확인 |
 | 이벤트 파이프라인 증명 | runs/pipeline_proof_relaxed_20260917/ | annotated MP4, 이벤트 CSV, 실제 추출 clip |
+| 탑다운 전용 설정 증명 | runs/topdown_proof_20260918/ | 중심점 근접도, 75프레임 annotated MP4와 track/event log |
 
 ## 첫 영상 실행 후 볼 것
 

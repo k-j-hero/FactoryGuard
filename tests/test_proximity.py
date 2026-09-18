@@ -19,6 +19,18 @@ class ProximityTests(unittest.TestCase):
         self.assertAlmostEqual(value, 10 / (20000 ** 0.5))
         self.assertAlmostEqual(value, normalized_proximity(*scaled, 200, 200))
 
+    def test_topdown_center_anchor(self):
+        person = Track(1, "person", (0, 0, 20, 20), 0.9)
+        forklift = Track(2, "forklift", (20, 20, 60, 60), 0.9)
+        center = normalized_proximity(person, forklift, 100, 100, "center")
+        bottom = normalized_proximity(person, forklift, 100, 100, "bottom_center")
+        self.assertAlmostEqual(center, (30 ** 2 + 30 ** 2) ** 0.5 / (20000 ** 0.5))
+        self.assertNotEqual(center, bottom)
+
+    def test_invalid_anchor_mode(self):
+        with self.assertRaises(ValueError):
+            ProximityEngine(10, anchor_mode="corner")
+
     def test_short_transient_is_rejected(self):
         e = self.engine()
         e.update(0, pair(), 100, 100)

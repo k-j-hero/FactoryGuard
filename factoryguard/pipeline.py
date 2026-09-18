@@ -30,14 +30,15 @@ def result_tracks(result, class_mapping):
     return tracks
 
 
-def annotate(frame, result, tracks, distances, active, frame_index, fps, enabled, enter):
+def annotate(frame, result, tracks, distances, active, frame_index, fps, enabled, enter,
+             anchor_mode):
     # plot() also shows detections that have not received a track ID yet.
     frame = result.plot(img=frame, labels=True, conf=True)
     by_id = {track.track_id: track for track in tracks}
     for pair, distance in distances.items():
         if distance > enter and pair not in active:
             continue
-        a, b = [tuple(round(v) for v in by_id[tid].anchor) for tid in pair]
+        a, b = [tuple(round(v) for v in by_id[tid].anchor_for(anchor_mode)) for tid in pair]
         color = (20, 30, 240) if pair in active else (0, 190, 255)
         cv2.line(frame, a, b, color, 2)
         cv2.putText(frame, f"NP={distance:.3f}", a, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
@@ -123,7 +124,7 @@ def run(source, output_dir, config, max_frames=None, model=None):
                 distances, active, closed = engine.update(frame_index, tracks, width, height)
                 record(closed)
                 rendered = annotate(frame, result, tracks, distances, active, frame_index,
-                                    fps, enabled, engine.enter)
+                                    fps, enabled, engine.enter, engine.anchor_mode)
                 writer.write(rendered)
                 frame_index += 1
                 if frame_index % 100 == 0:
@@ -168,7 +169,7 @@ def run(source, output_dir, config, max_frames=None, model=None):
             "frame_limit_reached": limited,
             "duration_sec": frame_index / fps, "event_count": len(events),
             "clip_count": len(clips), "elapsed_sec": time.perf_counter() - started,
-            "metric": "bottom-center Euclidean distance / frame diagonal; lower is closer",
+            "metric": f"{engine.anchor_mode.replace('_', '-')} Euclidean distance / frame diagonal; lower is closer",
             "limitations": "Image-space candidate only. No physical distance or accident probability.",
         }
         (output / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")

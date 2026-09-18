@@ -15,12 +15,21 @@ class Track:
         x1, _, x2, y2 = self.bbox
         return ((x1 + x2) / 2, y2)
 
+    def anchor_for(self, mode):
+        x1, y1, x2, y2 = self.bbox
+        if mode == "center":
+            return ((x1 + x2) / 2, (y1 + y2) / 2)
+        if mode == "bottom_center":
+            return ((x1 + x2) / 2, y2)
+        raise ValueError(f"Unknown anchor mode: {mode}")
 
-def normalized_proximity(person, forklift, width, height):
+
+def normalized_proximity(person, forklift, width, height, anchor_mode="bottom_center"):
     """Smaller means closer in image space; this is not a physical distance."""
     if width <= 0 or height <= 0:
         raise ValueError("Frame dimensions must be positive")
-    a, b = person.anchor, forklift.anchor
+    a = person.anchor_for(anchor_mode)
+    b = forklift.anchor_for(anchor_mode)
     return hypot(a[0] - b[0], a[1] - b[1]) / hypot(width, height)
 
 
@@ -54,16 +63,20 @@ class PairState:
 
 class ProximityEngine:
     def __init__(self, fps, enter_threshold=0.08, exit_threshold=0.11,
-                 min_duration_sec=0.5, lost_tolerance_sec=0.3):
+                 min_duration_sec=0.5, lost_tolerance_sec=0.3,
+                 anchor_mode="bottom_center"):
         if fps <= 0 or not 0 < enter_threshold < exit_threshold <= 1:
             raise ValueError("Invalid FPS or proximity thresholds")
         if min_duration_sec <= 0 or lost_tolerance_sec < 0:
             raise ValueError("Invalid temporal thresholds")
+        if anchor_mode not in {"bottom_center", "center"}:
+            raise ValueError("Invalid anchor mode")
         self.fps = fps
         self.enter = enter_threshold
         self.exit = exit_threshold
         self.required = max(1, ceil(min_duration_sec * fps))
         self.allowed_missing = int(lost_tolerance_sec * fps)
+        self.anchor_mode = anchor_mode
         self.states = {}
         self.sequence = 0
         self.previous_frame = -1
@@ -84,7 +97,8 @@ class ProximityEngine:
         self.previous_frame = frame_index
         people = [t for t in tracks if t.label == "person"]
         forklifts = [t for t in tracks if t.label == "forklift"]
-        distances = {(p.track_id, f.track_id): normalized_proximity(p, f, width, height)
+        distances = {(p.track_id, f.track_id): normalized_proximity(
+                     p, f, width, height, self.anchor_mode)
                      for p in people for f in forklifts}
         closed = []
         for pair in list(self.states):

@@ -4,6 +4,8 @@
 
 YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate → annotated MP4 / CSV / event clips.
 
+**포트폴리오 MVP의 권장 범위는 고정형 탑다운/버드아이 창고 카메라입니다.** Warehouse Safety 전용 모델과 박스 중심점 근접도를 사용하는 실행 방법은 [탑다운 MVP 범위](docs/TOPDOWN_MVP.md)에 정리했습니다.
+
 화면상 근접 후보를 검토하는 도구입니다. 실제 거리(m), 사고 확률, 충돌 여부를 추정하지 않습니다. PPE, PLC, DB, 웹 대시보드는 이 버전의 범위에 포함하지 않습니다.
 
 ## 구현 상태

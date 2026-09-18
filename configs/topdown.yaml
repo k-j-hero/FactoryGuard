@@ -1,0 +1,20 @@
+# Recommended MVP profile for a fixed overhead/bird's-eye warehouse camera.
+model: runs/train/warehouse_yolo26s/weights/best.pt
+device: cpu
+imgsz: 640
+conf: 0.10
+iou: 0.50
+tracker: configs/bytetrack.stable.yaml
+require_forklift: true
+person_names: [person]
+forklift_names: [forklift]
+proximity:
+  anchor_mode: center
+  enter_threshold: 0.08
+  exit_threshold: 0.11
+  min_duration_sec: 0.5
+  lost_tolerance_sec: 0.3
+clips:
+  enabled: true
+  pre_sec: 2.0
+  post_sec: 2.0
