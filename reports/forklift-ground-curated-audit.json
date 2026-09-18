@@ -1,0 +1,80 @@
+{
+  "status": "pass",
+  "generated_at_utc": "2026-09-18T00:11:52.367482+00:00",
+  "dataset_yaml": "data/forklift_ground_curated/data.yaml",
+  "class_names": {
+    "0": "forklift",
+    "1": "person"
+  },
+  "splits": {
+    "train": {
+      "image_dirs": [
+        "data/forklift_ground_curated/train/images"
+      ],
+      "label_dirs": [
+        "data/forklift_ground_curated/train/labels"
+      ],
+      "images": 181,
+      "labels": 181,
+      "paired": 181,
+      "missing_labels": 0,
+      "orphan_labels": 0,
+      "empty_labels": 1,
+      "invalid_annotations": 0,
+      "class_instances": {
+        "0": 205,
+        "1": 208
+      }
+    },
+    "val": {
+      "image_dirs": [
+        "data/forklift_ground_curated/valid/images"
+      ],
+      "label_dirs": [
+        "data/forklift_ground_curated/valid/labels"
+      ],
+      "images": 59,
+      "labels": 59,
+      "paired": 59,
+      "missing_labels": 0,
+      "orphan_labels": 0,
+      "empty_labels": 0,
+      "invalid_annotations": 0,
+      "class_instances": {
+        "0": 70,
+        "1": 64
+      }
+    },
+    "test": {
+      "image_dirs": [
+        "data/forklift_ground_curated/test/images"
+      ],
+      "label_dirs": [
+        "data/forklift_ground_curated/test/labels"
+      ],
+      "images": 29,
+      "labels": 29,
+      "paired": 29,
+      "missing_labels": 0,
+      "orphan_labels": 0,
+      "empty_labels": 0,
+      "invalid_annotations": 0,
+      "class_instances": {
+        "0": 30,
+        "1": 34
+      }
+    }
+  },
+  "totals": {
+    "images": 269,
+    "class_instances": {
+      "0": 305,
+      "1": 306
+    },
+    "errors": 0,
+    "warnings": 0
+  },
+  "exact_duplicate_groups_across_splits": [],
+  "possible_source_overlap_groups_across_splits": [],
+  "issues": []
+}

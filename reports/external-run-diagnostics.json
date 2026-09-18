@@ -1,0 +1,130 @@
+{
+  "runs": [
+    {
+      "run": "runs/combined_demo_20260917",
+      "frames": 300,
+      "fps": 25.0,
+      "events": 2,
+      "video_width": 3840,
+      "video_height": 2160,
+      "short_track_frames": 10,
+      "overlap_iou": 0.5,
+      "classes": {
+        "forklift": {
+          "rows": 340,
+          "frames_with_track": 240,
+          "unique_ids": 15,
+          "short_ids": 10,
+          "max_tracks_per_frame": 3,
+          "overlap_frames": 6,
+          "overlap_frame_ratio": 0.025,
+          "confidence_mean": 0.5966797893538195,
+          "confidence_below_0_25_ratio": 0.08235294117647059,
+          "box_area_median": 0.3949061391039105,
+          "box_area_p90": 0.5212974606994388,
+          "box_area_max": 0.5508933462041405,
+          "box_area_over_0_5_ratio": 0.2852941176470588
+        },
+        "person": {
+          "rows": 331,
+          "frames_with_track": 249,
+          "unique_ids": 16,
+          "short_ids": 13,
+          "max_tracks_per_frame": 3,
+          "overlap_frames": 81,
+          "overlap_frame_ratio": 0.3253012048192771,
+          "confidence_mean": 0.5631464508860133,
+          "confidence_below_0_25_ratio": 0.06042296072507553,
+          "box_area_median": 0.39790660106886344,
+          "box_area_p90": 0.49954287000074044,
+          "box_area_max": 0.5395746133677959,
+          "box_area_over_0_5_ratio": 0.09667673716012085
+        }
+      }
+    },
+    {
+      "run": "runs/combined_stable_20260918",
+      "frames": 300,
+      "fps": 25.0,
+      "events": 2,
+      "video_width": 3840,
+      "video_height": 2160,
+      "short_track_frames": 10,
+      "overlap_iou": 0.5,
+      "classes": {
+        "forklift": {
+          "rows": 306,
+          "frames_with_track": 225,
+          "unique_ids": 10,
+          "short_ids": 6,
+          "max_tracks_per_frame": 3,
+          "overlap_frames": 0,
+          "overlap_frame_ratio": 0.0,
+          "confidence_mean": 0.6343541029913753,
+          "confidence_below_0_25_ratio": 0.042483660130718956,
+          "box_area_median": 0.3958634444244941,
+          "box_area_p90": 0.518274484339701,
+          "box_area_max": 0.554383017248682,
+          "box_area_over_0_5_ratio": 0.2549019607843137
+        },
+        "person": {
+          "rows": 235,
+          "frames_with_track": 235,
+          "unique_ids": 6,
+          "short_ids": 3,
+          "max_tracks_per_frame": 1,
+          "overlap_frames": 0,
+          "overlap_frame_ratio": 0.0,
+          "confidence_mean": 0.639649618813332,
+          "confidence_below_0_25_ratio": 0.00851063829787234,
+          "box_area_median": 0.3953793957045141,
+          "box_area_p90": 0.5011003602394536,
+          "box_area_max": 0.5276876158762173,
+          "box_area_over_0_5_ratio": 0.10638297872340426
+        }
+      }
+    },
+    {
+      "run": "runs/curated_demo_20260918",
+      "frames": 300,
+      "fps": 25.0,
+      "events": 0,
+      "video_width": 3840,
+      "video_height": 2160,
+      "short_track_frames": 10,
+      "overlap_iou": 0.5,
+      "classes": {
+        "forklift": {
+          "rows": 49,
+          "frames_with_track": 49,
+          "unique_ids": 4,
+          "short_ids": 2,
+          "max_tracks_per_frame": 1,
+          "overlap_frames": 0,
+          "overlap_frame_ratio": 0.0,
+          "confidence_mean": 0.5234620847872326,
+          "confidence_below_0_25_ratio": 0.16326530612244897,
+          "box_area_median": 0.27904561141753204,
+          "box_area_p90": 0.3799858535276458,
+          "box_area_max": 0.39476795431222383,
+          "box_area_over_0_5_ratio": 0.0
+        },
+        "person": {
+          "rows": 347,
+          "frames_with_track": 277,
+          "unique_ids": 9,
+          "short_ids": 4,
+          "max_tracks_per_frame": 4,
+          "overlap_frames": 49,
+          "overlap_frame_ratio": 0.17689530685920576,
+          "confidence_mean": 0.7582890813263075,
+          "confidence_below_0_25_ratio": 0.08357348703170028,
+          "box_area_median": 0.35911327632946066,
+          "box_area_p90": 0.4705876803560157,
+          "box_area_max": 0.49589120409587106,
+          "box_area_over_0_5_ratio": 0.0
+        }
+      }
+    }
+  ]
+}

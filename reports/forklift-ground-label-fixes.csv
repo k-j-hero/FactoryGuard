@@ -1,0 +1,3 @@
+label,remove_lines,reason
+data/forklift_ground/train/labels/HLHO9S5T01KM_jpg.rf.b0b7c108ae25609f596ae5a50224917d.txt,1,full-frame person duplicates the actual operator box
+data/forklift_ground/train/labels/8YVPWMG6TN0R_jpg.rf.5e1034ea3fcf1cab17276bc226af4ae5.txt,3,oversized forklift box duplicates the tighter forklift box

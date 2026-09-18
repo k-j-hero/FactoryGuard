@@ -1,0 +1,14 @@
+# Generated locally with prepare_curated_dataset.py. Original data is unchanged.
+path: ../data
+train:
+  - warehouse/train/images
+  - forklift_ground_curated/train/images
+val:
+  - warehouse/valid/images
+  - forklift_ground_curated/valid/images
+test:
+  - warehouse/test/images
+  - forklift_ground_curated/test/images
+names:
+  0: forklift
+  1: person

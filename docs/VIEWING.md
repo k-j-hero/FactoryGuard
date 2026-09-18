@@ -13,13 +13,21 @@
 | 실행 설정 | configs/default.yaml | 장치, 임계값, 최소 관측 시간, 클립 앞뒤 길이 |
 | 학습 곡선 | runs/train/warehouse_yolo26s/results.png | loss와 validation 지표의 epoch별 변화 |
 | 통합 학습 곡선 | runs/train/combined_yolo26s/results.png | 지상 시점 보강 후 loss와 validation 지표 변화 |
+| 정제 ablation 곡선 | runs/train/curated_yolo26s/results.png | 큰 객체 중심 이미지 제외 후 80 epoch 학습 변화 |
+| 세 설정 비교 이미지 | docs/assets/external-three-way.jpg | 기존, 안정형 추적, 데이터 필터 모델의 같은 프레임 비교 |
 | 데이터 감사 보고서 | reports/combined-dataset-audit.json | split별 이미지·객체 수, 누락·좌표 오류·중복 여부 |
+| 라벨 검토 contact sheet | runs/label-review/forklift-ground/ | 큰 박스와 명백한 중복 라벨을 표시한 19개 이미지 |
+| 데이터 품질 결론 | docs/DATA_QUALITY.md | 선별 기준, 재학습 결과, precision/recall tradeoff |
 | 모델 비교 원시 수치 | reports/model-evaluation.json | baseline/통합 모델의 지상 시점·원래 test 성능 비교 |
+| 외부 영상 실행 진단 | reports/external-run-diagnostics.json | 박스 면적, 겹침 프레임, 고유·단기 ID 비교 |
 | W&B 오프라인 run | runs/train/combined_yolo26s/wandb/offline-run-20260918_083036-wxl58ot9 | 80 epoch metrics, 설정, 곡선 이미지, 평가표. `wandb sync` 후 웹에서 확인 |
 | W&B 자동 callback 증명 | runs/train/wandb/offline-run-20260918_083410-1fscae27 | 새 학습의 metrics·곡선·best.pt artifact 기록 여부 |
+| 정제 ablation W&B run | runs/train/wandb/offline-run-20260918_091204-x6u8lzle | 큰 객체 중심 이미지 제외 학습의 80 epoch metrics와 곡선 |
 | test 평가 그림 | runs/eval/warehouse_test/ | confusion matrix, PR/F1 곡선, 예측 샘플 |
 | baseline 외부 영상 | runs/trained_demo_20260917/annotated.mp4 | 사람 탐지와 지게차 누락 실패 사례 |
 | 통합 모델 외부 영상 | runs/combined_demo_20260917/annotated.mp4 | 지게차 존재 회복, 후보 2건, 과대 박스·오탐도 함께 확인 |
+| 안정형 추적 외부 영상 | runs/combined_stable_20260918/annotated.mp4 | ID·겹침 감소와 남아 있는 과대 forklift 박스를 함께 확인 |
+| 정제 모델 외부 영상 | runs/curated_demo_20260918/annotated.mp4 | 과대 박스 감소와 지게차 탐지 프레임 감소를 함께 확인 |
 | 이벤트 파이프라인 증명 | runs/pipeline_proof_relaxed_20260917/ | annotated MP4, 이벤트 CSV, 실제 추출 clip |
 
 ## 첫 영상 실행 후 볼 것

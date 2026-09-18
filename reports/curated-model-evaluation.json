@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-09-18",
+  "model": "runs/train/curated_yolo26s/weights/best.pt",
+  "settings": {"imgsz": 640, "batch": 8, "device": 0},
+  "validation": {
+    "all": {"precision": 0.853, "recall": 0.832, "map50": 0.885, "map50_95": 0.702},
+    "forklift": {"precision": 0.809, "recall": 0.811, "map50": 0.855, "map50_95": 0.639},
+    "person": {"precision": 0.898, "recall": 0.852, "map50": 0.914, "map50_95": 0.764}
+  },
+  "curated_combined_test": {
+    "all": {"precision": 0.8521223098, "recall": 0.8327299348, "map50": 0.8256867387, "map50_95": 0.6293145931},
+    "forklift": {"ground_truth": 37, "precision": 0.7575127245, "recall": 0.8648648649, "map50": 0.7862427491, "map50_95": 0.5362735217},
+    "person": {"ground_truth": 111, "precision": 0.9467318952, "recall": 0.8005950047, "map50": 0.8651307283, "map50_95": 0.7223556644}
+  },
+  "original_ground_test": {
+    "all": {"precision": 0.8602348007, "recall": 0.6820861404, "map50": 0.7199361920, "map50_95": 0.4418168895},
+    "forklift": {"ground_truth": 43, "precision": 0.8437157385, "recall": 0.8789274492, "map50": 0.8568818636, "map50_95": 0.5710736652},
+    "person": {"ground_truth": 44, "precision": 0.8767538630, "recall": 0.4852448317, "map50": 0.5829905203, "map50_95": 0.3125601138}
+  },
+  "warehouse_test": {
+    "all": {"precision": 0.8153404880, "recall": 0.9675324675, "map50": 0.8698285916, "map50_95": 0.7968060699},
+    "forklift": {"ground_truth": 7, "precision": 0.6681949338, "recall": 1.0, "map50": 0.756, "map50_95": 0.6954130952},
+    "person": {"ground_truth": 77, "precision": 0.9624860422, "recall": 0.9350649351, "map50": 0.9836571833, "map50_95": 0.8981990446}
+  },
+  "external_video_300_frames": {
+    "run": "runs/curated_demo_20260918",
+    "forklift": {"track_rows": 49, "frames_with_track": 49, "unique_ids": 4, "short_ids": 2, "max_per_frame": 1, "overlap_frame_ratio": 0.0, "box_area_p90": 0.3799858535},
+    "person": {"track_rows": 347, "frames_with_track": 277, "unique_ids": 9, "short_ids": 4, "max_per_frame": 4, "overlap_frame_ratio": 0.1768953069, "box_area_p90": 0.4705876804},
+    "events": 0,
+    "interpretation": "Large forklift false boxes and duplicate tracks decreased, but actual forklift coverage also dropped. No ground-truth recall is claimed."
+  }
+}

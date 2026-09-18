@@ -1,0 +1,9 @@
+tracker_type: bytetrack
+# Keep low-confidence detections available for ByteTrack's second association,
+# but require stronger evidence before starting a new track.
+track_high_thresh: 0.40
+track_low_thresh: 0.10
+new_track_thresh: 0.40
+track_buffer: 30
+match_thresh: 0.8
+fuse_score: true

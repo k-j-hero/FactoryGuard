@@ -15,6 +15,8 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 - [x] 이벤트 전후 annotated MP4 클립 추출 및 별도 재추출 명령
 - [x] YOLO 형식 데이터 경로 확인 및 YOLO26s 학습 명령
 - [x] YOLO 라벨·누락 파일·split 중복을 검사하는 데이터 감사 도구
+- [x] 큰 박스·중복 박스를 선별하고 contact sheet를 만드는 라벨 검토 도구
+- [x] 원본을 보존하면서 검토 결과로 파생 데이터셋을 만드는 도구
 - [x] W&B 실시간 학습 로깅과 기존 Ultralytics run 가져오기
 - [x] VS Code 작업 공간/디버그 설정, 단위 테스트, GitHub Actions 설정
 - [x] 사전학습 YOLO26s + ByteTrack GPU 실행 검증 (person detection-only)
@@ -38,6 +40,14 @@ YOLO26s → ByteTrack → normalized proximity → potential near-miss candidate
 
 지상 시점 데이터를 보강한 통합 학습은 80 epoch를 완료했고 최고 checkpoint는 75번째 epoch였습니다. validation과 별도 test 결과는 [검증 문서](docs/VALIDATION.md)에 구분해 기록했습니다.
 
+![큰 객체 중심 이미지를 필터링한 YOLO26s 학습 곡선](docs/assets/curated-training-results.png)
+
+라벨 검토 후 큰 객체 중심 이미지 152장을 제외한 ablation도 80 epoch 학습했습니다. 외부 영상에서 거대한 지게차 오탐과 ID 분할은 감소했지만 실제 지게차 탐지 프레임도 줄었습니다. 성공과 한계는 [데이터 품질 검토](docs/DATA_QUALITY.md)에 함께 기록했습니다.
+
+![기존 추론, 안정형 추적 설정, 데이터 필터 모델 비교](docs/assets/external-three-way.jpg)
+
+같은 모델에서 NMS와 ByteTrack만 조정한 실험은 ID 분할과 중복을 줄였지만 큰 forklift 박스는 없애지 못했습니다. 즉 추적 안정화와 box regression 문제는 분리해서 다뤄야 합니다. 재현 설정은 `configs/inference.stable.yaml`과 `configs/bytetrack.stable.yaml`입니다.
+
 **처음 보는 경우:** [결과물을 어디서 어떻게 보는지](docs/VIEWING.md)부터 확인하세요.
 
 **테스트할 영상이 없다면:** [공개 샘플로 첫 실제 추론 실행](docs/FIRST_DEMO.md). 전용 가상환경에서 설치부터 짧은 결과 영상 생성까지 진행하는 명령을 제공합니다.
@@ -49,6 +59,9 @@ FactoryGuard/
 ├── infer.py                    # 영상 탐지·추적·이벤트 파이프라인
 ├── train.py                    # 데이터 경로 확인 및 fine-tuning
 ├── audit_dataset.py            # YOLO 라벨 품질과 split 중복 검사
+├── review_labels.py            # 의심 라벨 보고서와 contact sheet 생성
+├── prepare_curated_dataset.py  # 원본을 보존한 파생 데이터셋 생성
+├── analyze_runs.py             # 실행별 박스 크기·중복·ID 분할 비교
 ├── log_wandb.py                # 완료된 학습 결과를 W&B run으로 가져오기
 ├── extract_events.py           # CSV 기반 클립 재추출
 ├── factoryguard/
@@ -181,6 +194,26 @@ python train.py --data configs/data.combined.yaml --config configs/train.combine
 python train.py --data configs/data.combined.yaml --config configs/train.combined.yaml --device 0
 ```
 
+### 의심 라벨 검토와 파생 데이터셋
+
+큰 박스가 곧 오라벨이라는 뜻은 아니므로 자동으로 원본 라벨을 삭제하지 않습니다. 아래 명령은 화면 면적의 70% 이상인 박스, 같은 클래스 중복 박스, 클래스 간 거의 동일한 박스를 찾아 JSON/CSV와 검토용 contact sheet를 만듭니다.
+
+```bash
+python review_labels.py --data data/forklift_ground/data.yaml --report reports/forklift-ground-label-review.json --csv reports/forklift-ground-label-review.csv --sheets runs/label-review/forklift-ground
+```
+
+![지게차 보강 데이터 라벨 검토 예시](docs/assets/label-review-preview.jpg)
+
+검토 결과를 적용한 파생 데이터셋은 다음처럼 만듭니다. 원본 `data/forklift_ground`는 변경하지 않습니다.
+
+```bash
+python prepare_curated_dataset.py --data data/forklift_ground/data.yaml --review reports/forklift-ground-label-review.json --fixes reports/forklift-ground-label-fixes.csv --output data/forklift_ground_curated
+python audit_dataset.py --data data/forklift_ground_curated/data.yaml --output reports/forklift-ground-curated-audit.json
+python train.py --data configs/data.curated.yaml --config configs/train.curated.yaml --device 0
+```
+
+이번 검토에서는 421장 중 큰 객체 중심 이미지 152장을 파생 데이터셋에서 제외했습니다. 269장을 유지했고 모든 원본과 판단 근거는 보존했습니다. 자세한 해석은 [데이터 품질 검토](docs/DATA_QUALITY.md)에 기록했습니다.
+
 단일 데이터 학습 가중치는 기본적으로 `runs/train/warehouse_yolo26s/weights/best.pt`, 통합 데이터 학습 가중치는 `runs/train/combined_yolo26s/weights/best.pt`에 생성됩니다. 동일 이름의 기존 학습 결과가 있으면 실행을 중단하거나 설정의 `name`을 바꾸세요.
 
 2026-09-17 baseline 실행은 53 epoch에서 early stopping됐고, 최고 checkpoint는 38번째 epoch였습니다. 지상 시점 데이터를 추가한 통합 학습은 80 epoch를 완료했고 75번째 epoch가 선택됐습니다. 통합 test의 전체 mAP50-95는 0.664, forklift는 0.628, person은 0.699였습니다. 서로 다른 test 구성을 섞어 해석하지 않도록 전체 조건과 외부 영상 결과를 [검증 문서](docs/VALIDATION.md)에 기록했습니다.
@@ -211,6 +244,14 @@ python extract_events.py --video runs/site01/annotated.mp4 --events runs/site01/
 ```
 
 영상 길이를 넘는 구간은 잘라냅니다. 영상과 CSV는 반드시 같은 실행 결과를 사용하세요. 한 이벤트씩 읽어 메모리를 제한하므로 이벤트 수가 많으면 추출 시간이 늘어납니다. 중첩 이벤트는 별도 클립으로 남깁니다.
+
+실행 결과의 박스 크기와 ID 분할을 비교하려면 다음 명령을 사용합니다.
+
+```bash
+python analyze_runs.py --run runs/baseline --run runs/curated --output reports/run-diagnostics.json
+```
+
+클래스별 추적 행 수, 고유·단기 ID 수, 프레임당 최대 박스, 겹치는 박스가 존재한 프레임 비율, confidence와 박스 면적 분포를 같은 형식으로 기록합니다. 이 수치는 정답 라벨이 없는 영상의 Precision/Recall을 대신하지 않습니다.
 
 ## 8. 테스트와 포트폴리오 완성 순서
 
